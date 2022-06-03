@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <title>Singapore PSI</title>
+
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.20.2/dist/bootstrap-table.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.20.2/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"/>
+
+    <style>
+        .container {
+            max-width: 960px;
+        }
+
+        .header {
+            max-width: 700px;
+        }
+    </style>
+  </head>
+
+  <body style="background-color: black;">
+    <div class="container" style="color: white;">
+      <header>
+        <div class="header mx-auto text-center">
+          <h1>PSI Readings In Singapore</h1>
+        </div>
+      </header>
+        <h6 id="time" class="text-center"></h6>
+        <div class="table-responsive">
+          <table class="table text-center" style="color: white;">
+            <thead>
+              <tr>
+                <th data-field="metric">Metric</th>
+                <th data-field="national">National</th>
+                <th data-field="central">Central</th>
+                <th data-field="north">North</th>
+                <th data-field="south">South</th>
+                <th data-field="east">East</th>
+                <th data-field="west">West</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.getJSON("https://api.data.gov.sg/v1/environment/psi", function(data){
+                let timestamp = data.items[0].timestamp
+                let psi_data = data.items[0].readings
+                
+                $('#time').text("Last updated: " + moment(timestamp).format("DD MMM YYYY, hh:mm A"));
+
+                let parsed_psi = []
+                let metrics = Object.keys(psi_data)
+
+                metrics.forEach(function(metric) {
+                    parsed_psi.push({
+                        "metric": metric,
+                        "national": psi_data[metric].national,
+                        "north": psi_data[metric].north,
+                        "south": psi_data[metric].south,
+                        "east": psi_data[metric].east,
+                        "west": psi_data[metric].west,
+                        "central": psi_data[metric].central,
+                    })
+                });
+
+                $('table').bootstrapTable({
+                    data: parsed_psi
+                });
+            });
+        });
+      </script>
+  </body>
+</html>
